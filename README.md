@@ -7,6 +7,6 @@ Objectives:
 
 2)Cleaned the dataset by performing filtering,removing outliers,missing values etc.
 
-3)USed sklearn Linear Regression to build the model.
+3)Used sklearn Linear Regression to build the model.
 
-4)The accuracy received on test data was 87.3%.
+4)The accuracy on test data was 87.3%.
