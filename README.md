@@ -1,12 +1,26 @@
-# Real-Estate-price-prediction
-This is a Machine Learning model that predicts the cost of a property in Mumbai from aproximately 90 options.This python machine learning project is based on Linear Regression and uses Sklearn package.
+# Mumbai Real Estate Price Prediction
 
-Objectives:
+This project predicts the price of residential properties in Mumbai using a machine learning model trained on public housing data.
 
-1)The Mumbai Home Price dataset taken from Kaggle.com was analysed.
+The goal of the project is to:
+- Clean and explore a raw real-estate dataset,
+- Engineer useful features,
+- Train and evaluate a regression model,
+- Expose the model through a simple Streamlit web app that non-technical users can try.
 
-2)Cleaned the dataset by performing filtering,removing outliers,missing values etc.
+---
 
-3)Used sklearn Linear Regression to build the model.
+## 1. Project Structure
 
-4)The accuracy on test data was 87.3%.
+```text
+.
+├── data/
+│   └── Mumbai1.csv               # raw dataset
+├── models/
+│   └── house_price_model.pkl     # trained regression pipeline
+├── notebooks/
+│   └── real_estate_model.ipynb   # exploratory analysis & experimentation
+├── app.py                        # Streamlit app
+├── model_training.py             # training script
+├── requirements.txt
+└── README.md
