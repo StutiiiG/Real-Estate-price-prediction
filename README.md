@@ -3,7 +3,6 @@
 [![Streamlit App](https://img.shields.io/badge/Live_App-Streamlit-brightgreen?logo=streamlit)](https://realestatepricepredictormumbai.streamlit.app)
 
 An interactive machine learning web application that predicts housing prices across Mumbai based on property characteristics such as area, locality, amenities, and property condition.
----
 
 ## 🚀 Live Demo
 https://realestatepricepredictormumbai.streamlit.app
