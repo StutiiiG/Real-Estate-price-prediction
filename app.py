@@ -1,8 +1,8 @@
-
 import os
 import joblib
 import pandas as pd
 import streamlit as st
+from model_training import train_model
 
 MODEL_PATH = os.path.join("models", "house_price_model.pkl")
 DATA_PATH = "Mumbai1.csv"
@@ -17,14 +17,31 @@ def load_data():
         return df
     return None
 
-
 @st.cache_resource
 def load_model():
-    obj = joblib.load(MODEL_PATH)
-    pipeline = obj["pipeline"]
-    numeric_features = obj["numeric_features"]
-    categorical_features = obj["categorical_features"]
-    return pipeline, numeric_features, categorical_features
+    """
+    Load the trained model. If the pickle is missing or incompatible
+    (e.g., on Streamlit Cloud), retrain the model from Mumbai1.csv.
+    """
+    # 1) If file doesn't exist at all, train first
+    if not os.path.exists(MODEL_PATH):
+        train_model()
+
+    # 2) Try to load existing pickle
+    try:
+        obj = joblib.load(MODEL_PATH)
+        pipeline = obj["pipeline"]
+        numeric_features = obj["numeric_features"]
+        categorical_features = obj["categorical_features"]
+        return pipeline, numeric_features, categorical_features
+    except Exception:
+        # 3) If load fails (corrupt / incompatible), retrain then load again
+        train_model()
+        obj = joblib.load(MODEL_PATH)
+        pipeline = obj["pipeline"]
+        numeric_features = obj["numeric_features"]
+        categorical_features = obj["categorical_features"]
+        return pipeline, numeric_features, categorical_features
 
 
 def main():
