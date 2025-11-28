@@ -1,7 +1,6 @@
 HEAD
 import logging
 
-=======
 import os
 import joblib
 import pandas as pd
@@ -36,7 +35,6 @@ def load_data() -> pd.DataFrame | None:
         logger.warning("Data file not found at %s", DATA_PATH)
         return None
 
-=======
 MODEL_PATH = os.path.join("models", "house_price_model.pkl")
 DATA_PATH = "Mumbai1.csv"
 
