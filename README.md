@@ -1,16 +1,48 @@
-# Mumbai Real Estate Price Prediction
+# 🏙️ Mumbai Real Estate Price Prediction
 
-This project predicts the price of residential properties in Mumbai using a machine learning model trained on public housing data.
+[![Streamlit App](https://img.shields.io/badge/🚀_Live%20Demo-Streamlit-red?logo=streamlit)](https://realestatepricepredictormumbai.streamlit.app)
 
-The goal of the project is to:
-- Clean and explore a raw real-estate dataset,
-- Engineer useful features,
-- Train and evaluate a regression model,
-- Expose the model through a simple Streamlit web app that non-technical users can try.
+A machine learning web app to estimate **Mumbai property prices** based on area, locality, amenities, and housing features. Predictions are made using a trained regression model powered by **Scikit-Learn**, wrapped into an interactive app using **Streamlit**, and deployed on **Streamlit Cloud**.
+
+🔗 **Live App:** https://realestatepricepredictormumbai.streamlit.app  
+📂 **GitHub Repo:** https://github.com/StutiiiG/Real-Estate-price-prediction
 
 ---
 
-## 1. Project Structure
+## 📸 App Preview
+
+> *(Note: Add a screenshot to the project at `notebooks/app_preview.png` for this image to show)*
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/StutiiiG/Real-Estate-price-prediction/main/notebooks/app_preview.png" width="80%">
+</p>
+
+---
+## ✨ Key Features
+
+✔ Predicts house prices instantly  
+✔ Location-based estimates for multiple Mumbai regions  
+✔ Specify amenities like:
+- Gymnasium  
+- Car Parking  
+- 24×7 Security  
+- Lift  
+✔ Includes property type (New vs Resale)  
+✔ User-friendly interface — mobile & desktop responsive
+
+---
+## 🛠 Tech Stack
+
+| Layer | Tools |
+|------|------|
+| Frontend UI | Streamlit |
+| Machine Learning | Scikit-Learn, Pandas, NumPy |
+| Deployment | Streamlit Cloud |
+| Version Control | GitHub |
+
+---
+
+## 📂 Project Structure
 
 ```text
 .
@@ -24,3 +56,11 @@ The goal of the project is to:
 ├── model_training.py             # training script
 ├── requirements.txt
 └── README.md
+
+## ▶️ How to Run Locally
+
+```bash
+git clone https://github.com/StutiiiG/Real-Estate-price-prediction.git
+cd Real-Estate-price-prediction
+pip install -r requirements.txt
+streamlit run app.py
