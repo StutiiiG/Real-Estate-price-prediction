@@ -1,9 +1,11 @@
 import logging
 
+import joblib
 import pandas as pd
 import streamlit as st
 
-from src.config import DATA_PATH  # uses the path you defined in config.py
+from src.config import DATA_PATH, MODEL_PATH
+from src.train import train_model
 
 # -------------------------------------------------------------------
 # Logging configuration
@@ -16,128 +18,91 @@ logger = logging.getLogger(__name__)
 
 
 # -------------------------------------------------------------------
-# Data helpers
+# Data + model loading
 # -------------------------------------------------------------------
 @st.cache_data
 def load_data() -> pd.DataFrame | None:
-    """Load the Mumbai housing dataset defined in DATA_PATH."""
     try:
         df = pd.read_csv(DATA_PATH)
-
-        # Drop any unnamed index columns
         unnamed = [c for c in df.columns if c.lower().startswith("unnamed")]
         if unnamed:
             df = df.drop(columns=unnamed)
-
         return df
     except FileNotFoundError:
         logger.warning("Data file not found at %s", DATA_PATH)
         return None
+
+
+@st.cache_resource
+def load_model():
+    """
+    Load trained model.
+
+    If the serialized model is missing or incompatible in the cloud
+    environment, retrain and then reload.
+    """
+    logger.info("Loading model from %s", MODEL_PATH)
+    try:
+        obj = joblib.load(MODEL_PATH)
     except Exception as e:
-        logger.error("Failed to load data: %s", e)
-        return None
+        logger.warning("Model load failed (%s). Retraining...", e)
+        obj = train_model()
 
-
-@st.cache_data
-def get_locations() -> list[str]:
-    """
-    Return sorted unique locations from the dataset.
-
-    This is what drives the Location selectbox.
-    """
-    df = load_data()
-    if df is None or "Location" not in df.columns:
-        logger.warning("No Location column found; falling back to ['Mumbai'].")
-        return ["Mumbai"]
-
-    locs = (
-        df["Location"]
-        .dropna()
-        .astype(str)
-        .str.strip()
-        .replace("", pd.NA)
-        .dropna()
-        .unique()
-        .tolist()
-    )
-    locs = sorted(set(locs))
-    return locs if locs else ["Mumbai"]
-
-
-def predict_dummy_price(row: dict) -> float:
-    """
-    Dummy price estimator so the UI works even without a real model.
-
-    Replace this with your real model.predict() when you’re ready.
-    """
-    base = 15_00_0000  # base price
-    base += row["Area"] * 2000
-    base += row["No. of Bedrooms"] * 10_00_000
-    base += (row["Gymnasium"] + row["Swimming Pool"]) * 5_00_000
-    return float(base)
+    pipeline = obj["pipeline"]
+    numeric_features = obj["numeric_features"]
+    categorical_features = obj["categorical_features"]
+    return pipeline, numeric_features, categorical_features
 
 
 # -------------------------------------------------------------------
 # Streamlit UI
 # -------------------------------------------------------------------
 def main():
-    st.set_page_config(
-        page_title="Mumbai Real Estate Price Prediction",
-        layout="wide",
-    )
+    st.set_page_config(page_title="Mumbai Real Estate Price Prediction", layout="wide")
 
     st.title("Mumbai Real Estate Price Prediction")
     st.write(
-        "Enter property details below to get an estimated price based on a "
-        "machine learning model trained on Mumbai housing data."
+        "Estimate property prices in Mumbai using a machine learning model "
+        "trained on historical transaction data."
     )
 
     df = load_data()
-    locations = get_locations()
+    model, numeric_features, categorical_features = load_model()
 
-    # ---------------- FORM ----------------
-    st.header("Property details")
+    if df is not None and "Location" in df.columns:
+        locations = sorted(df["Location"].dropna().unique().tolist())
+    else:
+        locations = ["Mumbai"]
+
+    st.header("Property Details")
+
     col1, col2 = st.columns(2)
 
     with col1:
         area = st.number_input(
-            "Area (sq ft)",
-            min_value=100.0,
-            max_value=10000.0,
-            value=1500.0,
-            step=50.0,
+            "Area (sq ft)", min_value=100.0, max_value=10000.0, value=800.0, step=50.0
         )
         bedrooms = st.number_input(
-            "No. of Bedrooms",
-            min_value=1,
-            max_value=10,
-            value=4,
-            step=1,
+            "No. of Bedrooms", min_value=1, max_value=10, value=2, step=1
         )
-        location = st.selectbox(
-            "Location",
-            options=locations,
-            index=0,
-            help="Start typing to search across all locations in the dataset.",
-        )
+        location = st.selectbox("Location", options=locations)
 
     with col2:
         new_resale = st.selectbox("New or Resale", ["Resale", "New"])
-        gym = st.checkbox("Gymnasium", value=True)
+        gym = st.checkbox("Gymnasium")
         lift = st.checkbox("Lift Available", value=True)
         parking = st.checkbox("Car Parking", value=True)
         maint = st.checkbox("Maintenance Staff", value=True)
         sec24 = st.checkbox("24x7 Security", value=True)
-        play = st.checkbox("Children's Play Area", value=True)
-        club = st.checkbox("Clubhouse", value=True)
-        intercom = st.checkbox("Intercom", value=True)
+        play = st.checkbox("Children's Play Area")
+        club = st.checkbox("Clubhouse")
+        intercom = st.checkbox("Intercom")
         garden = st.checkbox("Landscaped Gardens")
         indoor = st.checkbox("Indoor Games")
-        gas = st.checkbox("Gas Connection", value=True)
-        track = st.checkbox("Jogging Track", value=True)
-        pool = st.checkbox("Swimming Pool", value=True)
+        gas = st.checkbox("Gas Connection")
+        track = st.checkbox("Jogging Track")
+        pool = st.checkbox("Swimming Pool")
 
-    # Single row for model / dummy input
     row = {
         "Area": area,
         "No. of Bedrooms": bedrooms,
@@ -158,12 +123,11 @@ def main():
         "Location": location,
     }
 
-    st.write("")  # spacer
+    feature_cols = numeric_features + categorical_features
+    X_input = pd.DataFrame([row])[feature_cols]
 
     if st.button("Predict Price"):
-        # === replace this with your real model when ready ===
-        price = predict_dummy_price(row)
-
+        price = model.predict(X_input)[0]
         st.subheader(f"Estimated Price: ₹{price:,.0f}")
 
         if df is not None and "Price" in df.columns:
@@ -175,6 +139,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
