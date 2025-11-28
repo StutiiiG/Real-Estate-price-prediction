@@ -1,12 +1,8 @@
-HEAD
 import logging
-
-import os
 import joblib
 import pandas as pd
 import streamlit as st
 
-HEAD
 from src.config import DATA_PATH, MODEL_PATH
 from src.train import train_model
 
@@ -21,47 +17,35 @@ logger = logging.getLogger(__name__)
 
 
 # -------------------------------------------------------------------
-# Data + model loading
+# Data loading
 # -------------------------------------------------------------------
 @st.cache_data
 def load_data() -> pd.DataFrame | None:
+    """Load the Mumbai housing dataset from DATA_PATH."""
     try:
         df = pd.read_csv(DATA_PATH)
+
+        # Drop unnamed index columns if present
         unnamed = [c for c in df.columns if c.lower().startswith("unnamed")]
         if unnamed:
             df = df.drop(columns=unnamed)
+
         return df
     except FileNotFoundError:
         logger.warning("Data file not found at %s", DATA_PATH)
         return None
-
-MODEL_PATH = os.path.join("models", "house_price_model.pkl")
-DATA_PATH = "Mumbai1.csv"
-
-
-@st.cache_data
-def load_data():
-    if os.path.exists(DATA_PATH):
-        df = pd.read_csv(DATA_PATH)
-        if "Unnamed: 0" in df.columns:
-            df = df.drop(columns=["Unnamed: 0"])
-        return df
-    return None
+    except Exception as e:
+        logger.exception("Unexpected error while loading data: %s", e)
+        return None
 
 
+# -------------------------------------------------------------------
+# Model loading
+# -------------------------------------------------------------------
 @st.cache_resource
 def load_model():
-HEAD
     """
-    Load trained model.
-
-    obj = joblib.load(MODEL_PATH)
-    pipeline = obj["pipeline"]
-    numeric_features = obj["numeric_features"]
-    categorical_features = obj["categorical_features"]
-    return pipeline, numeric_features, categorical_features
-
-4a14772 (Local changes before rebase)
+    Load the trained model pipeline.
 
     If the serialized model is missing or incompatible in the cloud
     environment, retrain and then reload.
@@ -70,7 +54,7 @@ HEAD
     try:
         obj = joblib.load(MODEL_PATH)
     except Exception as e:
-        logger.warning("Model load failed (%s). Retraining...", e)
+        logger.warning("Model load failed (%s). Retraining model...", e)
         obj = train_model()
 
     pipeline = obj["pipeline"]
@@ -83,49 +67,49 @@ HEAD
 # Streamlit UI
 # -------------------------------------------------------------------
 def main():
-    st.set_page_config(page_title="Mumbai Real Estate Price Prediction", layout="wide")
+    st.set_page_config(
+        page_title="Mumbai Real Estate Price Prediction",
+        layout="wide",
+    )
 
     st.title("Mumbai Real Estate Price Prediction")
     st.write(
-        "Estimate property prices in Mumbai using a machine learning model "
-        "trained on historical transaction data."
+        "Enter property details below to get an estimated price based on a "
+        "machine learning model trained on Mumbai housing data."
     )
 
     df = load_data()
     model, numeric_features, categorical_features = load_model()
 
-HEAD
+    # ----- Location options -----
     if df is not None and "Location" in df.columns:
         locations = sorted(df["Location"].dropna().unique().tolist())
     else:
         locations = ["Mumbai"]
 
-    st.header("Property Details")
-
-    if df is not None:
-        locations = sorted(df["Location"].dropna().unique().tolist())
-    else:
-        locations = []
-
-    st.subheader("Property details")
-
+    # ----- Input form -----
+    st.header("Property details")
     col1, col2 = st.columns(2)
 
     with col1:
         area = st.number_input(
-            "Area (sq ft)", min_value=100.0, max_value=10000.0, value=800.0, step=50.0
+            "Area (sq ft)",
+            min_value=100.0,
+            max_value=10000.0,
+            value=800.0,
+            step=50.0,
         )
         bedrooms = st.number_input(
-            "No. of Bedrooms", min_value=1, max_value=10, value=2, step=1
+            "No. of Bedrooms",
+            min_value=1,
+            max_value=10,
+            value=2,
+            step=1,
         )
-HEAD
-        location = st.selectbox("Location", options=locations)
-
         location = st.selectbox(
             "Location",
-            options=locations if locations else ["Kharghar"],
+            options=locations,
         )
-
 
     with col2:
         new_resale = st.selectbox("New or Resale", ["Resale", "New"])
@@ -143,6 +127,7 @@ HEAD
         track = st.checkbox("Jogging Track")
         pool = st.checkbox("Swimming Pool")
 
+    # Build single-row input for the model
     row = {
         "Area": area,
         "No. of Bedrooms": bedrooms,
@@ -173,11 +158,11 @@ HEAD
         if df is not None and "Price" in df.columns:
             avg_price = df["Price"].mean()
             st.caption(f"Average price in dataset: ₹{avg_price:,.0f}")
-HEAD
 
-        st.caption("Note: This tool is for educational use only, not financial advice.")
+    st.caption("Note: This tool is for educational use only, not financial advice.")
 
 
 if __name__ == "__main__":
     main()
+
 
