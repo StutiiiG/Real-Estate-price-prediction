@@ -62,7 +62,7 @@ A machine learning web app to estimate **Mumbai property prices** based on area,
 ## ▶️ How to Run Locally
 
 ``bash
-git clone https://github.com/StutiiiG/Real-Estate-price-prediction.git
-cd Real-Estate-price-prediction
-pip install -r requirements.txt
-streamlit run app.py
+``git clone https://github.com/StutiiiG/Real-Estate-price-prediction.git
+``cd Real-Estate-price-prediction
+``pip install -r requirements.txt
+``streamlit run app.py
