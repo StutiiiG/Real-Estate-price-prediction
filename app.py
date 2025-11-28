@@ -1,14 +1,14 @@
-<<<<<<< HEAD
+HEAD
 import logging
 
 =======
 import os
->>>>>>> 4a14772 (Local changes before rebase)
+4a14772 (Local changes before rebase)
 import joblib
 import pandas as pd
 import streamlit as st
 
-<<<<<<< HEAD
+HEAD
 from src.config import DATA_PATH, MODEL_PATH
 from src.train import train_model
 
@@ -55,17 +55,17 @@ def load_data():
 
 @st.cache_resource
 def load_model():
-<<<<<<< HEAD
+HEAD
     """
     Load trained model.
-=======
+
     obj = joblib.load(MODEL_PATH)
     pipeline = obj["pipeline"]
     numeric_features = obj["numeric_features"]
     categorical_features = obj["categorical_features"]
     return pipeline, numeric_features, categorical_features
 
->>>>>>> 4a14772 (Local changes before rebase)
+4a14772 (Local changes before rebase)
 
     If the serialized model is missing or incompatible in the cloud
     environment, retrain and then reload.
@@ -98,21 +98,21 @@ def main():
     df = load_data()
     model, numeric_features, categorical_features = load_model()
 
-<<<<<<< HEAD
+HEAD
     if df is not None and "Location" in df.columns:
         locations = sorted(df["Location"].dropna().unique().tolist())
     else:
         locations = ["Mumbai"]
 
     st.header("Property Details")
-=======
+
     if df is not None:
         locations = sorted(df["Location"].dropna().unique().tolist())
     else:
         locations = []
 
     st.subheader("Property details")
->>>>>>> 4a14772 (Local changes before rebase)
+4a14772 (Local changes before rebase)
 
     col1, col2 = st.columns(2)
 
@@ -123,14 +123,14 @@ def main():
         bedrooms = st.number_input(
             "No. of Bedrooms", min_value=1, max_value=10, value=2, step=1
         )
-<<<<<<< HEAD
+HEAD
         location = st.selectbox("Location", options=locations)
-=======
+
         location = st.selectbox(
             "Location",
             options=locations if locations else ["Kharghar"],
         )
->>>>>>> 4a14772 (Local changes before rebase)
+4a14772 (Local changes before rebase)
 
     with col2:
         new_resale = st.selectbox("New or Resale", ["Resale", "New"])
@@ -178,11 +178,11 @@ def main():
         if df is not None and "Price" in df.columns:
             avg_price = df["Price"].mean()
             st.caption(f"Average price in dataset: ₹{avg_price:,.0f}")
-<<<<<<< HEAD
+HEAD
 
         st.caption("Note: This tool is for educational use only, not financial advice.")
-=======
->>>>>>> 4a14772 (Local changes before rebase)
+
+4a14772 (Local changes before rebase)
 
 
 
