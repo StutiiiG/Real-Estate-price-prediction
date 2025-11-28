@@ -37,16 +37,6 @@ The serialized trained pipeline is version-controlled for reproducibility and ef
 
 ---
 
-## 📊 Performance
-
-| Metric | Value |
-|--------|-------|
-| R² Score | 0.60+ |
-
-_(Performance derived using cleaned Mumbai housing dataset)_
-
----
-
 ## 🛠️ Tech Stack
 
 | Layer | Technology |
