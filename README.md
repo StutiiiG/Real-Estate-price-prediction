@@ -17,7 +17,7 @@ https://realestatepricepredictormumbai.streamlit.app
 
 | Home UI | Price Output |
 |--------|--------------|
-| ![UI Screenshot 1](./assets/ui_1.png) | ![UI Screenshot 2](./assets/ui_2.png) |
+| ![UI Screenshot 1](./assets/UI_home.png) | ![UI Screenshot 2](./assets/UI_prediction.png) |
 
 ---
 
