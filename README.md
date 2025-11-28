@@ -7,7 +7,7 @@ An interactive machine learning web application that predicts housing prices acr
 ## 🚀 Live Demo
 https://realestatepricepredictormumbai.streamlit.app
 
----
+--
 
 ## 📸 App Previews
 
@@ -15,7 +15,7 @@ https://realestatepricepredictormumbai.streamlit.app
 |--------|--------------|
 | ![UI Screenshot 1](./assets/UI_home.png) | ![UI Screenshot 2](./assets/UI_prediction.png) |
 
----
+--
 
 ## 🎯 Key Features
 
@@ -27,7 +27,7 @@ https://realestatepricepredictormumbai.streamlit.app
 | Configurable Property Features | Bedrooms, area, amenities, property type |
 | Cloud-Safe Execution | Retrains in cloud to ensure compatibility |
 
----
+--
 
 ## 🧠 Model Workflow
 
@@ -35,7 +35,7 @@ User Input → Feature Engineering → RandomForestRegressor → Price Predictio
 
 The serialized trained pipeline is version-controlled for reproducibility and efficient loading.
 
----
+--
 
 ## 🛠️ Tech Stack
 
