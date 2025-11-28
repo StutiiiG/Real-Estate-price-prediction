@@ -1,65 +1,80 @@
-import os
+import logging
+
 import joblib
 import pandas as pd
 import streamlit as st
-from model_training import train_model
 
-MODEL_PATH = os.path.join("models", "house_price_model.pkl")
-DATA_PATH = "Mumbai1.csv"
+from src.config import DATA_PATH, MODEL_PATH
+from src.train import train_model
+
+# -------------------------------------------------------------------
+# Logging configuration
+# -------------------------------------------------------------------
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 
+# -------------------------------------------------------------------
+# Data + model loading
+# -------------------------------------------------------------------
 @st.cache_data
-def load_data():
-    if os.path.exists(DATA_PATH):
+def load_data() -> pd.DataFrame | None:
+    try:
         df = pd.read_csv(DATA_PATH)
-        if "Unnamed: 0" in df.columns:
-            df = df.drop(columns=["Unnamed: 0"])
+        unnamed = [c for c in df.columns if c.lower().startswith("unnamed")]
+        if unnamed:
+            df = df.drop(columns=unnamed)
         return df
-    return None
+    except FileNotFoundError:
+        logger.warning("Data file not found at %s", DATA_PATH)
+        return None
+
 
 @st.cache_resource
 def load_model():
     """
-    Load the trained model. If the pickle is missing or incompatible
-    (e.g., on Streamlit Cloud), retrain the model from Mumbai1.csv.
-    """
-    # 1) If file doesn't exist at all, train first
-    if not os.path.exists(MODEL_PATH):
-        train_model()
+    Load trained model.
 
-    # 2) Try to load existing pickle
+    If the serialized model is missing or incompatible in the cloud
+    environment, retrain and then reload.
+    """
+    logger.info("Loading model from %s", MODEL_PATH)
     try:
         obj = joblib.load(MODEL_PATH)
-        pipeline = obj["pipeline"]
-        numeric_features = obj["numeric_features"]
-        categorical_features = obj["categorical_features"]
-        return pipeline, numeric_features, categorical_features
-    except Exception:
-        # 3) If load fails (corrupt / incompatible), retrain then load again
-        train_model()
-        obj = joblib.load(MODEL_PATH)
-        pipeline = obj["pipeline"]
-        numeric_features = obj["numeric_features"]
-        categorical_features = obj["categorical_features"]
-        return pipeline, numeric_features, categorical_features
+    except Exception as e:
+        logger.warning("Model load failed (%s). Retraining...", e)
+        obj = train_model()
+
+    pipeline = obj["pipeline"]
+    numeric_features = obj["numeric_features"]
+    categorical_features = obj["categorical_features"]
+    return pipeline, numeric_features, categorical_features
 
 
+# -------------------------------------------------------------------
+# Streamlit UI
+# -------------------------------------------------------------------
 def main():
+    st.set_page_config(page_title="Mumbai Real Estate Price Prediction", layout="wide")
+
     st.title("Mumbai Real Estate Price Prediction")
     st.write(
-        "Enter property details below to get an estimated price based on a machine "
-        "learning model trained on Mumbai housing data."
+        "Estimate property prices in Mumbai using a machine learning model "
+        "trained on historical transaction data."
     )
 
     df = load_data()
     model, numeric_features, categorical_features = load_model()
 
-    if df is not None:
+    if df is not None and "Location" in df.columns:
         locations = sorted(df["Location"].dropna().unique().tolist())
     else:
-        locations = []
+        locations = ["Mumbai"]
 
-    st.subheader("Property details")
+    st.header("Property Details")
 
     col1, col2 = st.columns(2)
 
@@ -70,10 +85,7 @@ def main():
         bedrooms = st.number_input(
             "No. of Bedrooms", min_value=1, max_value=10, value=2, step=1
         )
-        location = st.selectbox(
-            "Location",
-            options=locations if locations else ["Kharghar"],
-        )
+        location = st.selectbox("Location", options=locations)
 
     with col2:
         new_resale = st.selectbox("New or Resale", ["Resale", "New"])
@@ -122,7 +134,7 @@ def main():
             avg_price = df["Price"].mean()
             st.caption(f"Average price in dataset: ₹{avg_price:,.0f}")
 
-        st.caption("Note: This is an educational demo, not financial advice.")
+        st.caption("Note: This tool is for educational use only, not financial advice.")
 
 
 if __name__ == "__main__":
