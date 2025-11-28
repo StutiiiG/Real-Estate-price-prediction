@@ -74,8 +74,7 @@ def main():
 
     st.title("Mumbai Real Estate Price Prediction")
     st.write(
-        "Enter property details below to get an estimated price based on a "
-        "machine learning model trained on Mumbai housing data."
+        "Enter property details below to get an estimated price for a property in Mumbia, India"
     )
 
     df = load_data()
