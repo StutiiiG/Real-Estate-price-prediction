@@ -49,17 +49,6 @@ The serialized trained pipeline is version-controlled for reproducibility and ef
 
 ---
 
-## 📁 Repository Structure
 
-```bash
-Real-Estate-price-prediction/
-│
-├── app.py                # Streamlit UI & inference logic
-├── model_training.py     # Training + model persistence
-├── requirements.txt      # Python dependencies
-├── models/               # Serialized model artifacts (auto-created)
-├── notebooks/            # Dataset & experiments
-├── Mumbai1.csv           # Source dataset (excluded in deployment)
-└── assets/               # UI screenshots for README (add your images here)
 
 
