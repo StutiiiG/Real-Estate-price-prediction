@@ -1,68 +1,80 @@
 # 🏙️ Mumbai Real Estate Price Prediction
 
-[![Streamlit App](https://img.shields.io/badge/🚀_Live%20Demo-Streamlit-red?logo=streamlit)](https://realestatepricepredictormumbai.streamlit.app)
+[![Streamlit App](https://img.shields.io/badge/Live_App-Streamlit-brightgreen?logo=streamlit)](https://realestatepricepredictormumbai.streamlit.app)
 
-A machine learning web app to estimate **Mumbai property prices** based on area, locality, amenities, and housing features. Predictions are made using a trained regression model powered by **Scikit-Learn**, wrapped into an interactive app using **Streamlit**, and deployed on **Streamlit Cloud**.
-
-🔗 **Live App:** https://realestatepricepredictormumbai.streamlit.app  
-📂 **GitHub Repo:** https://github.com/StutiiiG/Real-Estate-price-prediction
+An interactive machine learning web application that predicts housing prices across Mumbai based on property characteristics such as area, locality, amenities, and property condition. Built with Python, Scikit-Learn, and Streamlit — deployed on Streamlit Cloud with automatic model retraining.
 
 ---
 
-## 📸 App Preview
-
-> *(Note: Add a screenshot to the project at `notebooks/app_preview.png` for this image to show)*
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/StutiiiG/Real-Estate-price-prediction/main/notebooks/app_preview.png" width="80%">
-</p>
+## 🚀 Live Demo
+👉 https://realestatepricepredictormumbai.streamlit.app
 
 ---
-## ✨ Key Features
 
-✔ Predicts house prices instantly  
-✔ Location-based estimates for multiple Mumbai regions  
-✔ Specify amenities like:
-- Gymnasium  
-- Car Parking  
-- 24×7 Security  
-- Lift  
-✔ Includes property type (New vs Resale)  
-✔ User-friendly interface — mobile & desktop responsive
+## 📸 App Previews
+
+> To add screenshot images — upload them into your GitHub repo (root folder or `/assets`)  
+> Then replace the image filenames below with your actual uploaded filenames.
+
+| Home UI | Price Output |
+|--------|--------------|
+| ![UI Screenshot 1](./assets/ui_1.png) | ![UI Screenshot 2](./assets/ui_2.png) |
 
 ---
-## 🛠 Tech Stack
 
-| Layer | Tools |
-|------|------|
-| Frontend UI | Streamlit |
-| Machine Learning | Scikit-Learn, Pandas, NumPy |
+## 🎯 Key Features
+
+| Feature | Description |
+|--------|-------------|
+| Automated ML Pipeline | Preprocessing, feature encoding, and model training |
+| Live Deployment | Real-time inference via Streamlit UI |
+| Location Intelligence | Captures value differences across Mumbai neighborhoods |
+| Configurable Property Features | Bedrooms, area, amenities, property type |
+| Cloud-Safe Execution | Retrains in cloud to ensure compatibility |
+
+---
+
+## 🧠 Model Workflow
+
+User Input → Feature Engineering → RandomForestRegressor → Price Prediction → UI Rendering
+
+The serialized trained pipeline is version-controlled for reproducibility and efficient loading.
+
+---
+
+## 📊 Performance
+
+| Metric | Value |
+|--------|-------|
+| R² Score | 0.60+ |
+
+_(Performance derived using cleaned Mumbai housing dataset)_
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|------|------------|
+| Machine Learning | Python, Scikit-Learn, Pandas |
+| Web UI | Streamlit |
+| Model Persistence | Joblib |
 | Deployment | Streamlit Cloud |
-| Version Control | GitHub |
+| Version Control | Git + GitHub |
 
 ---
 
-## 📂 Project Structure
+## 📁 Repository Structure
 
-``text
-.
-├── data/
-│   └── Mumbai1.csv               # raw dataset
-├── models/
-│   └── house_price_model.pkl     # trained regression pipeline
-├── notebooks/
-│   └── real_estate_model.ipynb   # exploratory analysis & experimentation
-├── app.py                        # Streamlit app
-├── model_training.py             # training script
-├── requirements.txt
-└── README.md
+```bash
+Real-Estate-price-prediction/
+│
+├── app.py                # Streamlit UI & inference logic
+├── model_training.py     # Training + model persistence
+├── requirements.txt      # Python dependencies
+├── models/               # Serialized model artifacts (auto-created)
+├── notebooks/            # Dataset & experiments
+├── Mumbai1.csv           # Source dataset (excluded in deployment)
+└── assets/               # UI screenshots for README (add your images here)
 
----
 
-## ▶️ How to Run Locally
-
-``bash
-``git clone https://github.com/StutiiiG/Real-Estate-price-prediction.git
-``cd Real-Estate-price-prediction
-``pip install -r requirements.txt
-``streamlit run app.py
