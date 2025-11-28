@@ -1,3 +1,4 @@
+
 import os
 import joblib
 import pandas as pd
@@ -35,14 +36,6 @@ def main():
 
     df = load_data()
     model, numeric_features, categorical_features = load_model()
-
-    # numeric_features from model_training.py:
-    # ['Area', 'No. of Bedrooms', 'New/Resale', 'Gymnasium', 'Lift Available',
-    #  'Car Parking', 'Maintenance Staff', '24x7 Security',
-    #  \"Children's Play Area\", 'Clubhouse', 'Intercom', 'Landscaped Gardens',
-    #  'Indoor Games', 'Gas Connection', 'Jogging Track', 'Swimming Pool']
-    #
-    # categorical_features = ['Location']
 
     if df is not None:
         locations = sorted(df["Location"].dropna().unique().tolist())
