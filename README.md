@@ -44,7 +44,7 @@ A machine learning web app to estimate **Mumbai property prices** based on area,
 
 ## 📂 Project Structure
 
-```text
+``text
 .
 ├── data/
 │   └── Mumbai1.csv               # raw dataset
@@ -57,9 +57,11 @@ A machine learning web app to estimate **Mumbai property prices** based on area,
 ├── requirements.txt
 └── README.md
 
+---
+
 ## ▶️ How to Run Locally
 
-```bash
+``bash
 git clone https://github.com/StutiiiG/Real-Estate-price-prediction.git
 cd Real-Estate-price-prediction
 pip install -r requirements.txt
