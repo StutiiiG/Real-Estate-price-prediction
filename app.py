@@ -1,4 +1,5 @@
 import logging
+import os
 
 import joblib
 import pandas as pd
@@ -22,14 +23,20 @@ logger = logging.getLogger(__name__)
 # -------------------------------------------------------------------
 @st.cache_data
 def load_data() -> pd.DataFrame | None:
+    """Load raw CSV if it exists (used for locations + summary stats)."""
     try:
-        df = pd.read_csv(DATA_PATH)
-        unnamed = [c for c in df.columns if c.lower().startswith("unnamed")]
-        if unnamed:
-            df = df.drop(columns=unnamed)
-        return df
-    except FileNotFoundError:
-        logger.warning("Data file not found at %s", DATA_PATH)
+        if DATA_PATH and os.path.exists(DATA_PATH):
+            df = pd.read_csv(DATA_PATH)
+            # Drop unnamed index-like columns
+            unnamed = [c for c in df.columns if c.lower().startswith("unnamed")]
+            if unnamed:
+                df = df.drop(columns=unnamed)
+            return df
+        else:
+            logger.info("DATA_PATH does not exist on this environment: %s", DATA_PATH)
+            return None
+    except Exception as e:
+        logger.warning("Failed to load data from %s (%s)", DATA_PATH, e)
         return None
 
 
@@ -38,8 +45,8 @@ def load_model():
     """
     Load trained model.
 
-    If the serialized model is missing or incompatible in the cloud
-    environment, retrain and then reload.
+    If the serialized model is missing or incompatible,
+    retrain and then reload.
     """
     logger.info("Loading model from %s", MODEL_PATH)
     try:
@@ -54,38 +61,86 @@ def load_model():
     return pipeline, numeric_features, categorical_features
 
 
+def get_locations(model, df: pd.DataFrame | None, categorical_features: list[str]) -> list[str]:
+    """
+    Return list of locations for the selectbox.
+
+    1. Prefer unique values from df['Location'] if df is available.
+    2. Otherwise, infer categories from the model's OneHotEncoder.
+    3. Fall back to ['Mumbai'] if all else fails.
+    """
+    # --- 1. Try from dataframe ---
+    if df is not None and "Location" in df.columns:
+        locs = sorted(df["Location"].dropna().astype(str).unique().tolist())
+        if locs:
+            return locs
+
+    # --- 2. Try from model encoder (works on Streamlit Cloud without CSV) ---
+    try:
+        # Assumes your pipeline has a "preprocess" step with a "cat" OneHotEncoder
+        preprocess = model.named_steps.get("preprocess")
+        if preprocess is not None and "cat" in preprocess.named_transformers_:
+            ohe = preprocess.named_transformers_["cat"]
+            if hasattr(ohe, "categories_"):
+                idx = categorical_features.index("Location")
+                locs = list(ohe.categories_[idx])
+                locs = [str(x) for x in locs if str(x).strip()]
+                locs = sorted(set(locs))
+                if locs:
+                    return locs
+    except Exception as e:
+        logger.warning("Could not infer locations from model: %s", e)
+
+    # --- 3. Final fallback ---
+    return ["Mumbai"]
+
+
 # -------------------------------------------------------------------
 # Streamlit UI
 # -------------------------------------------------------------------
 def main():
-    st.set_page_config(page_title="Mumbai Real Estate Price Prediction", layout="wide")
+    st.set_page_config(
+        page_title="Mumbai Real Estate Price Prediction",
+        layout="wide",
+    )
 
     st.title("Mumbai Real Estate Price Prediction")
     st.write(
-        "Estimate property prices in Mumbai using a machine learning model "
-        "trained on historical transaction data."
+        "Enter property details below to get an estimated price based on a "
+        "machine learning model trained on Mumbai housing data."
     )
 
     df = load_data()
     model, numeric_features, categorical_features = load_model()
+    locations = get_locations(model, df, categorical_features)
 
-    if df is not None and "Location" in df.columns:
-        locations = sorted(df["Location"].dropna().unique().tolist())
-    else:
-        locations = ["Mumbai"]
-
-    st.header("Property Details")
+    # ---------------- UI: Property Details ----------------
+    st.header("Property details")
 
     col1, col2 = st.columns(2)
 
     with col1:
         area = st.number_input(
-            "Area (sq ft)", min_value=100.0, max_value=10000.0, value=800.0, step=50.0
+            "Area (sq ft)",
+            min_value=100.0,
+            max_value=10000.0,
+            value=1500.0,
+            step=50.0,
         )
         bedrooms = st.number_input(
-            "No. of Bedrooms", min_value=1, max_value=10, value=2, step=1
+            "No. of Bedrooms",
+            min_value=1,
+            max_value=10,
+            value=2,
+            step=1,
         )
-        location = st.selectbox("Location", options=locations)
+
+        location = st.selectbox(
+            "Location",
+            options=locations,
+            index=0,
+            help="Start typing to search for a locality from the training data.",
+        )
 
     with col2:
         new_resale = st.selectbox("New or Resale", ["Resale", "New"])
@@ -103,6 +158,7 @@ def main():
         track = st.checkbox("Jogging Track")
         pool = st.checkbox("Swimming Pool")
 
+    # Build feature row
     row = {
         "Area": area,
         "No. of Bedrooms": bedrooms,
@@ -134,11 +190,12 @@ def main():
             avg_price = df["Price"].mean()
             st.caption(f"Average price in dataset: ₹{avg_price:,.0f}")
 
-        st.caption("Note: This tool is for educational use only, not financial advice.")
+    st.caption("Note: This tool is for educational use only, not financial advice.")
 
 
 if __name__ == "__main__":
     main()
+
 
 
 
