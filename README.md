@@ -12,9 +12,6 @@ https://realestatepricepredictormumbai.streamlit.app
 
 ## 📸 App Previews
 
-> To add screenshot images — upload them into your GitHub repo (root folder or `/assets`)  
-> Then replace the image filenames below with your actual uploaded filenames.
-
 | Home UI | Price Output |
 |--------|--------------|
 | ![UI Screenshot 1](./assets/UI_home.png) | ![UI Screenshot 2](./assets/UI_prediction.png) |
