@@ -49,7 +49,6 @@ def load_data():
             df = df.drop(columns=["Unnamed: 0"])
         return df
     return None
->>>>>>> 4a14772 (Local changes before rebase)
 
 
 @st.cache_resource
@@ -111,7 +110,6 @@ HEAD
         locations = []
 
     st.subheader("Property details")
-4a14772 (Local changes before rebase)
 
     col1, col2 = st.columns(2)
 
@@ -129,7 +127,7 @@ HEAD
             "Location",
             options=locations if locations else ["Kharghar"],
         )
-4a14772 (Local changes before rebase)
+
 
     with col2:
         new_resale = st.selectbox("New or Resale", ["Resale", "New"])
@@ -180,9 +178,6 @@ HEAD
 HEAD
 
         st.caption("Note: This tool is for educational use only, not financial advice.")
-
-4a14772 (Local changes before rebase)
-
 
 
 if __name__ == "__main__":
